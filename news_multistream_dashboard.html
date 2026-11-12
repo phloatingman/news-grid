@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Multistream Dashboard</title>
+    <!-- Tailwind CSS for modern styling and responsive grid -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Slate 900 */
+            color: #f8fafc; /* Slate 50 */
+        }
+        /* Custom scrollbar hiding for clean look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col overflow-hidden m-0 p-0">
+
+    <!-- Top Navigation / Header -->
+    <header id="app-header" class="bg-slate-900 border-b border-slate-800 px-4 py-3 flex items-center justify-between shrink-0 shadow-md transition-all duration-300">
+        <div class="flex items-center space-x-3">
+            <div class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+            <h1 class="text-lg font-bold tracking-wide text-slate-100 flex items-center gap-2">
+                LIVE <span class="text-xs px-2 py-0.5 bg-slate-800 border border-slate-700 rounded text-slate-400 font-normal">2x2 Multi-Feed</span>
+            </h1>
+        </div>
+        
+        <!-- Controls & Instructions Toggle -->
+        <div class="flex items-center space-x-2">
+            <button onclick="toggleFullScreenGrid()" class="px-3 py-1.5 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                Full Screen Grid
+            </button>
+            <button onclick="unmuteAll()" class="px-3 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                Unmute Audio
+            </button>
+            <button onclick="toggleModal(true)" class="px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                GitHub Guide
+            </button>
+        </div>
+    </header>
+
+    <!-- Floating Exit Full Screen Button (Visible only in Full Screen Grid mode) -->
+    <div id="exit-fs-container" class="fixed top-3 right-3 z-50 hidden">
+        <button onclick="toggleFullScreenGrid()" class="bg-slate-900/90 hover:bg-slate-800 text-white px-3.5 py-2 rounded-xl border border-slate-700 shadow-xl backdrop-blur-md text-xs font-medium flex items-center gap-2 transition cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9H4v5m5 0H4m5 0l-5-5m11 5l5 5m-5-5h5m-5 0V4m0 5h5"></path></svg>
+            Exit Full Screen Grid
+        </button>
+    </div>
+
+    <!-- Main 2x2 Grid Container -->
+    <main id="grid-container" class="flex-1 grid grid-cols-1 md:grid-cols-2 grid-rows-2 md:grid-rows-2 gap-2 p-2 bg-slate-950 overflow-hidden transition-all duration-300">
+        
+        <!-- Stream 1: Bloomberg Television -->
+        <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800 flex flex-col shadow-lg group">
+            <div class="stream-label absolute top-2 left-3 z-10 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-slate-700/50 text-xs font-medium text-slate-200 pointer-events-none flex items-center gap-2 transition-opacity duration-300">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span> Bloomberg Television
+            </div>
+            <div class="relative w-full h-full flex-1">
+                <!-- Using YouTube iframe embed with autoplay and mute parameters -->
+                <iframe 
+                    id="stream-1"
+                    class="absolute inset-0 w-full h-full border-0"
+                    src="https://www.youtube-nocookie.com/embed/QB5BNdBFujE?autoplay=1&mute=1&controls=0&enablejsapi=1&playsinline=1" 
+                    title="Bloomberg Television Live Stream" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <!-- Stream 2: CNN -->
+        <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800 flex flex-col shadow-lg group">
+            <div class="stream-label absolute top-2 left-3 z-10 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-slate-700/50 text-xs font-medium text-slate-200 pointer-events-none flex items-center gap-2 transition-opacity duration-300">
+                <span class="w-2 h-2 rounded-full bg-red-500"></span> CNN Live
+            </div>
+            <div class="relative w-full h-full flex-1">
+                <iframe 
+                    id="stream-2"
+                    class="absolute inset-0 w-full h-full border-0"
+                    src="https://www.youtube-nocookie.com/embed/GotlA1KKWoo?autoplay=1&mute=1&controls=0&enablejsapi=1&playsinline=1" 
+                    title="CNN Live Stream" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <!-- Stream 3: Al Jazeera English -->
+        <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800 flex flex-col shadow-lg group">
+            <div class="stream-label absolute top-2 left-3 z-10 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-slate-700/50 text-xs font-medium text-slate-200 pointer-events-none flex items-center gap-2 transition-opacity duration-300">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span> Al Jazeera English
+            </div>
+            <div class="relative w-full h-full flex-1">
+                <iframe 
+                    id="stream-3"
+                    class="absolute inset-0 w-full h-full border-0"
+                    src="https://www.youtube-nocookie.com/embed/gCNeDWCI0vo?autoplay=1&mute=1&controls=0&enablejsapi=1&playsinline=1" 
+                    title="Al Jazeera English Live Stream" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+        <!-- Stream 4: ABC News -->
+        <div class="relative bg-slate-900 rounded-xl overflow-hidden border border-slate-800 flex flex-col shadow-lg group">
+            <div class="stream-label absolute top-2 left-3 z-10 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-md border border-slate-700/50 text-xs font-medium text-slate-200 pointer-events-none flex items-center gap-2 transition-opacity duration-300">
+                <span class="w-2 h-2 rounded-full bg-cyan-500"></span> ABC News Live
+            </div>
+            <div class="relative w-full h-full flex-1">
+                <iframe 
+                    id="stream-4"
+                    class="absolute inset-0 w-full h-full border-0"
+                    src="https://www.youtube-nocookie.com/embed/KQhNZQ_Uag8?autoplay=1&mute=1&controls=0&enablejsapi=1&playsinline=1" 
+                    title="ABC News Live Stream" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- GitHub Instructions Modal -->
+    <div id="guide-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative text-slate-200">
+            <button onclick="toggleModal(false)" class="absolute top-4 right-4 text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+            
+            <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-indigo-400" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path></svg>
+                Hosting on GitHub Pages
+            </h2>
+            
+            <ol class="space-y-3 text-sm text-slate-300 list-decimal list-inside">
+                <li><strong class="text-white">Save the file:</strong> Save the code above as <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">index.html</code> on your computer.</li>
+                <li><strong class="text-white">Create a GitHub repository:</strong> Go to GitHub, create a new public repository (e.g., named <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">news-dashboard</code>).</li>
+                <li><strong class="text-white">Upload index.html:</strong> Upload your <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">index.html</code> file to the root of the repository.</li>
+                <li><strong class="text-white">Enable GitHub Pages:</strong> Go to your repository's <em>Settings</em> &gt; <em>Pages</em>. Under <em>Build and deployment</em>, set the source branch to <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">main</code> (or <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">master</code>) and folder to <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">/ (root)</code>, then click Save.</li>
+                <li><strong class="text-white">View your live dashboard:</strong> After a minute, GitHub will publish your site at <code class="bg-slate-800 px-1.5 py-0.5 rounded text-indigo-300 font-mono">https://&lt;your-username&gt;.github.io/&lt;repo-name&gt;/</code>.</li>
+            </ol>
+            
+            <div class="mt-6 flex justify-end">
+                <button onclick="toggleModal(false)" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg transition text-sm cursor-pointer shadow">
+                    Got it!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isFullScreenGrid = false;
+
+        // Toggle instructions modal
+        function toggleModal(show) {
+            const modal = document.getElementById('guide-modal');
+            if (show) {
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        // Toggle Full Screen Grid view (hides header & padding for 100% video focus)
+        function toggleFullScreenGrid() {
+            isFullScreenGrid = !isFullScreenGrid;
+            const header = document.getElementById('app-header');
+            const gridContainer = document.getElementById('grid-container');
+            const exitButton = document.getElementById('exit-fs-container');
+            const labels = document.querySelectorAll('.stream-label');
+
+            if (isFullScreenGrid) {
+                header.classList.add('hidden');
+                exitButton.classList.remove('hidden');
+                gridContainer.classList.remove('p-2');
+                gridContainer.classList.add('p-0', 'gap-0');
+                labels.forEach(el => el.classList.add('opacity-0'));
+            } else {
+                header.classList.remove('hidden');
+                exitButton.classList.add('hidden');
+                gridContainer.classList.remove('p-0', 'gap-0');
+                gridContainer.classList.add('p-2');
+                labels.forEach(el => el.classList.remove('opacity-0'));
+            }
+        }
+
+        // Helper to interact with all YouTube iframes via postMessage for unmuting if desired
+        function unmuteAll() {
+            const iframes = document.querySelectorAll('iframe');
+            iframes.forEach(iframe => {
+                iframe.contentWindow.postMessage(JSON.stringify({
+                    event: 'command',
+                    func: 'unMute',
+                    args: []
+                }), '*');
+            });
+        }
+    </script>
+</body>
+</html>
