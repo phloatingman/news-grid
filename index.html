@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Live News Quad Grid</title>
     <style>
         * {
@@ -23,8 +23,8 @@
             width: 100vw;
             height: 100vh;
             background: #000;
-            gap: 4px; /* Adjust this value (e.g., 2px, 4px, 8px) to make the border/gap thicker or thinner */
-            padding: 4px; /* Matches the gap around the outer edges */
+            gap: 4px;
+            padding: 4px;
         }
         .video-wrapper {
             position: relative;
@@ -41,10 +41,30 @@
             border: none;
             pointer-events: auto;
         }
+        /* Fullscreen button overlay style */
+        #fs-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 10px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            cursor: pointer;
+        }
+        #fs-btn:active {
+            background: rgba(255, 255, 255, 0.4);
+        }
     </style>
 </head>
 <body>
-    <div class="grid-container">
+    <button id="fs-btn" onclick="toggleFullScreen()">Go Full Screen</button>
+
+    <div class="grid-container" id="grid">
         <!-- Top-Left: Bloomberg Business News -->
         <div class="video-wrapper">
             <iframe src="https://www.youtube.com/embed/QB5BNdBFujE?autoplay=1&mute=1&controls=0&playsinline=1&enablejsapi=1" 
@@ -77,5 +97,21 @@
                     allowfullscreen></iframe>
         </div>
     </div>
+
+    <script>
+        function toggleFullScreen() {
+            let elem = document.documentElement;
+            let btn = document.getElementById("fs-btn");
+            
+            if (!document.fullscreenElement) {
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) { /* Safari/iOS */
+                    elem.webkitRequestFullscreen();
+                }
+                btn.style.display = "none"; // Hide button once in full screen
+            }
+        }
+    </script>
 </body>
 </html>
